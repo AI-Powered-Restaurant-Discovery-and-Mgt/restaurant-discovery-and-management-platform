@@ -17,7 +17,12 @@ export const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center gap-8">
-          <a href="#pricing" className="text-secondary hover:text-primary transition-colors">
+          <a 
+            href="#pricing" 
+            className="text-secondary hover:text-primary transition-colors"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Pricing
           </a>
           <Button variant="outline" asChild>
