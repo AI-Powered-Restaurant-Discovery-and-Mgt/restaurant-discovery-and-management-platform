@@ -25,12 +25,22 @@ export const Hero = () => {
             </div>
           </div>
           
-          <div className="flex-1 relative h-[400px] w-full">
-            <img
-              src="/photo-1618160702438-9b02ab6515c9"
-              alt="Delicious food presentation"
-              className="w-full h-full object-cover rounded-lg shadow-xl animate-fade-in"
-            />
+          <div className="flex-1 relative h-[400px] w-full overflow-hidden rounded-2xl shadow-xl">
+            <picture>
+              <source
+                media="(min-width: 1024px)"
+                srcSet="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80&auto=format"
+              />
+              <source
+                media="(min-width: 768px)"
+                srcSet="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80&auto=format"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80&auto=format"
+                alt="Elegant fine dining experience"
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              />
+            </picture>
           </div>
         </div>
       </div>
