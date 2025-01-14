@@ -17,7 +17,7 @@ export const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="text-lg">
-                <Link to="/signup">Get Started</Link>
+                <Link to="/auth?mode=sign-up">Get Started</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="text-lg">
                 <Link to="/restaurants">Explore Restaurants</Link>

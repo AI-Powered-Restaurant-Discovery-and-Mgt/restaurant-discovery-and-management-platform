@@ -20,16 +20,14 @@ export const Header = () => {
           <a 
             href="#pricing" 
             className="text-secondary hover:text-primary transition-colors"
-            target="_blank"
-            rel="noopener noreferrer"
           >
             Pricing
           </a>
           <Button variant="outline" asChild>
-            <Link to="/signin">Sign In</Link>
+            <Link to="/auth?mode=sign-in">Sign In</Link>
           </Button>
           <Button asChild>
-            <Link to="/signup">Sign Up</Link>
+            <Link to="/auth?mode=sign-up">Sign Up</Link>
           </Button>
         </nav>
         

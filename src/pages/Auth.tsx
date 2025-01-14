@@ -39,11 +39,6 @@ const AuthPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-4">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold">Welcome Back</h1>
-          <p className="text-muted-foreground">Sign in to your account</p>
-        </div>
-        
         {errorMessage && (
           <Alert variant="destructive">
             <AlertDescription>{errorMessage}</AlertDescription>
@@ -58,10 +53,13 @@ const AuthPage = () => {
               variables: {
                 default: {
                   colors: {
-                    brand: 'rgb(var(--primary))',
-                    brandAccent: 'rgb(var(--primary))',
+                    brand: '#ff3131',
+                    brandAccent: '#ff3131',
                   },
                 },
+              },
+              className: {
+                button: 'bg-primary hover:bg-primary/90',
               },
             }}
             providers={[]}
