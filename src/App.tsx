@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
+import { Header } from "./components/Header";
+import { Hero } from "./components/Hero";
 
 const queryClient = new QueryClient();
 
@@ -26,11 +28,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   if (isAuthenticated === null) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return isAuthenticated ? <>{children}</> : <Navigate to="/auth" replace />;
 };
+
+const LandingPage = () => (
+  <>
+    <Header />
+    <Hero />
+  </>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -39,9 +48,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Index />
