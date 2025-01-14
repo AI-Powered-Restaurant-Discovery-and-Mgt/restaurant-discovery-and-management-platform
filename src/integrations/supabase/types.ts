@@ -13,22 +13,75 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          full_name: string | null
           id: string
           updated_at: string
+          user_type: Database["public"]["Enums"]["user_type"] | null
         }
         Insert: {
           created_at?: string
           email: string
+          full_name?: string | null
           id: string
           updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Update: {
           created_at?: string
           email?: string
+          full_name?: string | null
           id?: string
           updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Relationships: []
+      }
+      restaurants: {
+        Row: {
+          address: string | null
+          created_at: string
+          cuisine_type: string | null
+          description: string | null
+          email: string | null
+          id: string
+          name: string
+          owner_id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          cuisine_type?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          cuisine_type?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurants_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -38,7 +91,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_type: "customer" | "restaurant_owner"
     }
     CompositeTypes: {
       [_ in never]: never
