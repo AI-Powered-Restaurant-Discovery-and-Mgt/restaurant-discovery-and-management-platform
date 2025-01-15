@@ -18,12 +18,12 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="text-lg">
                 <Link to="/auth?mode=sign-up&type=restaurant_owner">
-                  Register Your Restaurant
+                  Sign up to manage your restaurant
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="text-lg">
                 <Link to="/auth?mode=sign-up&type=customer">
-                  Join as Customer
+                  Explore Restaurants Now
                 </Link>
               </Button>
             </div>
