@@ -2,18 +2,21 @@ import { useState, useEffect } from "react";
 import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { AuthError } from "@supabase/supabase-js";
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [errorMessage, setErrorMessage] = useState("");
+  const userType = searchParams.get("type") || "customer";
+  const mode = searchParams.get("mode") || "sign-in";
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN") {
-        navigate("/");
+        navigate("/dashboard");
       }
       if (event === "SIGNED_OUT") {
         setErrorMessage("");
@@ -46,6 +49,13 @@ const AuthPage = () => {
         )}
 
         <div className="bg-card p-6 rounded-lg shadow-sm border">
+          <h2 className="text-2xl font-semibold mb-6 text-center">
+            {mode === "sign-in" ? "Welcome Back" : "Create Account"}
+            <span className="block text-sm font-normal text-muted-foreground mt-1">
+              {userType === "restaurant_owner" ? "Restaurant Owner" : "Customer"}
+            </span>
+          </h2>
+          
           <SupabaseAuth
             supabaseClient={supabase}
             appearance={{
@@ -64,6 +74,10 @@ const AuthPage = () => {
             }}
             providers={[]}
             redirectTo={window.location.origin}
+            view={mode === "sign-in" ? "sign_in" : "sign_up"}
+            additionalData={{
+              user_type: userType,
+            }}
           />
         </div>
       </div>

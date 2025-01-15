@@ -17,10 +17,14 @@ export const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="text-lg">
-                <Link to="/auth?mode=sign-up">Get Started</Link>
+                <Link to="/auth?mode=sign-up&type=restaurant_owner">
+                  Register Your Restaurant
+                </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="text-lg">
-                <Link to="/restaurants">Explore Restaurants</Link>
+                <Link to="/auth?mode=sign-up&type=customer">
+                  Join as Customer
+                </Link>
               </Button>
             </div>
           </div>
