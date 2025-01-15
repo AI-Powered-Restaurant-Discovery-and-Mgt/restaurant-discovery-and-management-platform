@@ -46,6 +46,8 @@ const AuthPage = () => {
         return "Please verify your email address before signing in.";
       case "User not found":
         return "No user found with these credentials.";
+      case "User already registered":
+        return "This email is already registered. Please sign in instead.";
       default:
         return error.message;
     }
@@ -89,6 +91,7 @@ const AuthPage = () => {
               providers={[]}
               redirectTo={window.location.origin}
               view={mode === "sign-in" ? "sign_in" : "sign_up"}
+              onError={(error) => setErrorMessage(getErrorMessage(error))}
               additionalData={{
                 user_type: userType,
               }}
