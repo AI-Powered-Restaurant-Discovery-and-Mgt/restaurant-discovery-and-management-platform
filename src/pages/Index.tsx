@@ -72,13 +72,13 @@ const Index = () => {
         title="AI Tools to Manage Your Restaurant Effortlessly"
         features={ownerFeatures}
         ctaText="Sign Up to Manage Your Restaurant"
-        ctaLink="/signup"
+        ctaLink="/auth?mode=sign-up&type=restaurant_owner"
       />
       <FeatureSection
         title="Discover the Best Restaurants with AI-Powered Recommendations"
         features={customerFeatures}
         ctaText="Explore Restaurants Now"
-        ctaLink="/restaurants"
+        ctaLink="/auth?mode=sign-up&type=customer"
         alignment="right"
       />
       <Footer />
