@@ -91,7 +91,6 @@ const AuthPage = () => {
               providers={[]}
               redirectTo={window.location.origin}
               view={mode === "sign-in" ? "sign_in" : "sign_up"}
-              onError={(error) => setErrorMessage(getErrorMessage(error))}
               additionalData={{
                 user_type: userType,
               }}
