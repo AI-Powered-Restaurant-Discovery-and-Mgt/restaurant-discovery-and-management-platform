@@ -1,10 +1,17 @@
 import { Plus, ShoppingBag, Megaphone, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const QuickActions = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <Button variant="outline" className="flex flex-col h-24 gap-2">
+      <Button 
+        variant="outline" 
+        className="flex flex-col h-24 gap-2"
+        onClick={() => navigate("/dashboard/menu-management")}
+      >
         <Plus className="h-5 w-5" />
         <span>Add Menu Item</span>
       </Button>
