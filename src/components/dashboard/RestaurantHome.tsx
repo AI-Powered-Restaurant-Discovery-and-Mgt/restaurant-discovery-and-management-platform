@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, ShoppingCart, Calendar, Star, Bell } from "lucide-react";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, Tooltip } from "recharts";
+import { DollarSign, ShoppingCart, Calendar, Star } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, Tooltip, PieChart, Pie, Cell } from "recharts";
+import { WelcomeHeader } from "./WelcomeHeader";
+import { QuickActions } from "./QuickActions";
+import { AIRecommendations } from "./AIRecommendations";
 
 const salesData = [
   { date: "Mon", amount: 1200 },
@@ -22,77 +23,93 @@ const topItems = [
   { name: "Bruschetta", orders: 25 },
 ];
 
+const demographicData = [
+  { name: "18-24", value: 15 },
+  { name: "25-34", value: 35 },
+  { name: "35-44", value: 25 },
+  { name: "45-54", value: 15 },
+  { name: "55+", value: 10 },
+];
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+
 export const RestaurantHome = () => {
-  const [greeting, setGreeting] = useState("Good Morning");
-
-  useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour >= 12 && hour < 17) {
-      setGreeting("Good Afternoon");
-    } else if (hour >= 17) {
-      setGreeting("Good Evening");
-    }
-  }, []);
-
   return (
-    <div className="space-y-8 p-8 animate-fade-in">
-      {/* Welcome Section */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {greeting}, Restaurant Name
-        </h1>
-        <p className="text-muted-foreground">
-          Here's what's happening with your restaurant today.
-        </p>
-      </div>
+    <div className="space-y-8 animate-fade-in">
+      <WelcomeHeader restaurantName="Restaurant Name" />
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Sales Today</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$1,200</div>
-            <p className="text-xs text-muted-foreground">+8% from yesterday</p>
+            <div className="space-y-1">
+              <div className="text-2xl font-bold">$1,200</div>
+              <div className="text-xs text-muted-foreground">Today</div>
+              <div className="text-sm">
+                <span className="font-medium">$8,500</span>
+                <span className="text-muted-foreground"> this week</span>
+              </div>
+              <div className="text-sm">
+                <span className="font-medium">$32,000</span>
+                <span className="text-muted-foreground"> this month</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">Orders</CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">8 new, 15 in progress</p>
+            <div className="space-y-1">
+              <div className="text-2xl font-bold">73</div>
+              <div className="text-xs space-x-2">
+                <span className="text-green-500">8 new</span>
+                <span className="text-blue-500">15 in progress</span>
+                <span className="text-gray-500">50 completed</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Reservations Today</CardTitle>
+            <CardTitle className="text-sm font-medium">Reservations</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">5 upcoming</p>
+            <div className="space-y-1">
+              <div className="text-2xl font-bold">12</div>
+              <div className="text-xs text-muted-foreground">5 upcoming today</div>
+              <div className="text-sm text-muted-foreground">Next: 7:00 PM (4 guests)</div>
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+            <CardTitle className="text-sm font-medium">Rating</CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4.8</div>
-            <p className="text-xs text-muted-foreground">From 150 reviews</p>
+            <div className="space-y-1">
+              <div className="text-2xl font-bold">4.8</div>
+              <div className="text-xs text-muted-foreground">From 150 reviews</div>
+              <div className="text-sm text-green-500">+0.3 this week</div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Quick Actions */}
+      <QuickActions />
+
       {/* Charts Section */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="col-span-1">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="col-span-1 lg:col-span-2">
           <CardHeader>
             <CardTitle>Sales Trend</CardTitle>
           </CardHeader>
@@ -103,37 +120,42 @@ export const RestaurantHome = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis />
-                  <Tooltip content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="rounded-lg border bg-background p-2 shadow-sm">
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="flex flex-col">
-                              <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                Sales
-                              </span>
-                              <span className="font-bold text-muted-foreground">
-                                ${payload[0].value}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    }
-                    return null
-                  }} />
-                  <Area
-                    type="monotone"
-                    dataKey="amount"
-                    stroke="#ff3131"
-                    fill="#ff313120"
-                  />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="amount" stroke="#ff3131" fill="#ff313120" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
         <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle>Customer Demographics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={demographicData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {demographicData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="col-span-1 lg:col-span-2">
           <CardHeader>
             <CardTitle>Top Menu Items</CardTitle>
           </CardHeader>
@@ -144,25 +166,7 @@ export const RestaurantHome = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="rounded-lg border bg-background p-2 shadow-sm">
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="flex flex-col">
-                              <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                Orders
-                              </span>
-                              <span className="font-bold text-muted-foreground">
-                                {payload[0].value}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    }
-                    return null
-                  }} />
+                  <Tooltip />
                   <Bar dataKey="orders" fill="#ff3131" />
                 </BarChart>
               </ResponsiveContainer>
@@ -170,6 +174,9 @@ export const RestaurantHome = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Recommendations */}
+      <AIRecommendations />
 
       {/* Recent Activity */}
       <Card>
