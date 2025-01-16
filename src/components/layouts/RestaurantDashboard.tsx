@@ -1,4 +1,5 @@
 import { MinimalHeader } from "@/components/MinimalHeader";
+import { RestaurantHome } from "@/components/dashboard/RestaurantHome";
 import {
   Sidebar,
   SidebarContent,
@@ -178,7 +179,7 @@ export const RestaurantDashboard = () => {
               </div>
             </div>
             <div className="p-4 mt-32">
-              {/* Dashboard content will be rendered here based on selected section */}
+              <RestaurantHome />
             </div>
           </main>
         </SidebarProvider>
