@@ -179,7 +179,7 @@ export const RestaurantDashboard = () => {
               </div>
             </div>
             <div className="p-4 mt-32">
-              <RestaurantHome />
+              <Outlet />
             </div>
           </main>
         </SidebarProvider>
