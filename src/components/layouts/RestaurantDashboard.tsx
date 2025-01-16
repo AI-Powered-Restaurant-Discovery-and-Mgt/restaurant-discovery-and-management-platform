@@ -1,5 +1,5 @@
 import { MinimalHeader } from "@/components/MinimalHeader";
-import { RestaurantHome } from "@/components/dashboard/RestaurantHome";
+import { Outlet } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,

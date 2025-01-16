@@ -2,7 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import { RestaurantDashboard } from "@/components/layouts/RestaurantDashboard";
+import { CustomerDashboard } from "@/components/layouts/CustomerDashboard";
 import { MenuManagement } from "@/pages/MenuManagement";
+import { RestaurantHome } from "@/components/dashboard/RestaurantHome";
 
 function App() {
   return (
