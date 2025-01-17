@@ -25,18 +25,29 @@ export const MenuManagement = () => {
   const { data: categories = [], isLoading: isLoadingCategories } = useMenuCategories(restaurantId);
   const { data: menuItems = [], isLoading: isLoadingItems } = useMenuItems(restaurantId, selectedCategory, searchQuery);
 
+  if (isLoadingRestaurant || isLoadingCategories || isLoadingItems) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   if (restaurantError) {
     toast({
       variant: "destructive",
       title: "Error",
       description: "Failed to load restaurant information. Please try again later.",
     });
+    return null;
   }
 
-  if (isLoadingRestaurant || isLoadingCategories || isLoadingItems) {
+  if (!restaurantId) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <h2 className="text-xl font-semibold">No Restaurant Found</h2>
+        <p className="text-muted-foreground">Please create a restaurant first to manage menu items.</p>
+        <Button>Create Restaurant</Button>
       </div>
     );
   }

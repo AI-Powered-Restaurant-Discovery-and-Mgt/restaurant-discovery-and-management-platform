@@ -20,13 +20,13 @@ export const useRestaurantId = () => {
           .from("restaurants")
           .select("id")
           .eq("owner_id", user.id)
-          .single();
+          .maybeSingle();
 
         if (restaurantError) {
           throw restaurantError;
         }
 
-        setRestaurantId(restaurant.id);
+        setRestaurantId(restaurant?.id ?? null);
       } catch (err) {
         setError(err instanceof Error ? err : new Error("Failed to fetch restaurant ID"));
       } finally {
