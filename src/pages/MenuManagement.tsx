@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, Plus, Grid, List, Edit2, Trash2, BarChart } from "lucide-react";
+import { Search, Filter, Plus, Grid, List, Edit2, Trash2, BarChart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,30 +10,36 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRestaurantId } from "@/hooks/useRestaurantId";
+import { useMenuCategories } from "@/hooks/useMenuCategories";
+import { useMenuItems } from "@/hooks/useMenuItems";
+import { useToast } from "@/components/ui/use-toast";
 
 export const MenuManagement = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const categories = [
-    "All Items",
-    "Appetizers",
-    "Main Course",
-    "Desserts",
-    "Beverages",
-  ];
+  const { restaurantId, isLoading: isLoadingRestaurant, error: restaurantError } = useRestaurantId();
+  const { data: categories = [], isLoading: isLoadingCategories } = useMenuCategories(restaurantId);
+  const { data: menuItems = [], isLoading: isLoadingItems } = useMenuItems(restaurantId, selectedCategory, searchQuery);
 
-  const menuItems = [
-    {
-      id: 1,
-      name: "Margherita Pizza",
-      category: "Main Course",
-      price: 14.99,
-      image: "/placeholder.svg",
-      available: true,
-      rating: 4.5,
-    },
-    // ... more items would be loaded from the database
-  ];
+  if (restaurantError) {
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: "Failed to load restaurant information. Please try again later.",
+    });
+  }
+
+  if (isLoadingRestaurant || isLoadingCategories || isLoadingItems) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 p-8 animate-fade-in">
@@ -42,7 +48,12 @@ export const MenuManagement = () => {
         <div className="flex flex-1 gap-4">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search menu items..." className="pl-8" />
+            <Input 
+              placeholder="Search menu items..." 
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -84,60 +95,91 @@ export const MenuManagement = () => {
       </div>
 
       {/* Category Tabs */}
-      <Tabs defaultValue="All Items">
+      <Tabs 
+        defaultValue="all" 
+        onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
+      >
         <TabsList>
+          <TabsTrigger value="all">All Items</TabsTrigger>
           {categories.map((category) => (
-            <TabsTrigger key={category} value={category}>
-              {category}
+            <TabsTrigger key={category.id} value={category.id}>
+              {category.name}
             </TabsTrigger>
           ))}
         </TabsList>
+
+        <TabsContent value="all">
+          <MenuItemsGrid items={menuItems} viewMode={viewMode} />
+        </TabsContent>
+
         {categories.map((category) => (
-          <TabsContent key={category} value={category}>
-            <div className={`grid gap-4 ${
-              viewMode === "grid" 
-                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
-                : "grid-cols-1"
-            }`}>
-              {menuItems.map((item) => (
-                <Card key={item.id}>
-                  <CardHeader>
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-48 object-cover rounded-md"
-                    />
-                  </CardHeader>
-                  <CardContent>
-                    <CardTitle>{item.name}</CardTitle>
-                    <div className="mt-2 space-y-1">
-                      <p className="text-sm text-muted-foreground">
-                        {item.category}
-                      </p>
-                      <p className="font-medium">${item.price}</p>
-                      <div className="flex items-center gap-1">
-                        <span className="text-yellow-500">★</span>
-                        <span className="text-sm">{item.rating}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button variant="outline" size="icon">
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <BarChart className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+          <TabsContent key={category.id} value={category.id}>
+            <MenuItemsGrid 
+              items={menuItems.filter(item => item.category_id === category.id)} 
+              viewMode={viewMode} 
+            />
           </TabsContent>
         ))}
       </Tabs>
+    </div>
+  );
+};
+
+const MenuItemsGrid = ({ 
+  items, 
+  viewMode 
+}: { 
+  items: any[], 
+  viewMode: "grid" | "list" 
+}) => {
+  return (
+    <div className={`grid gap-4 ${
+      viewMode === "grid" 
+        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+        : "grid-cols-1"
+    }`}>
+      {items.map((item) => (
+        <Card key={item.id}>
+          <CardHeader>
+            <img
+              src={item.image_url || "/placeholder.svg"}
+              alt={item.name}
+              className="w-full h-48 object-cover rounded-md"
+            />
+          </CardHeader>
+          <CardContent>
+            <CardTitle>{item.name}</CardTitle>
+            <div className="mt-2 space-y-1">
+              <p className="text-sm text-muted-foreground">
+                {item.menu_categories?.name}
+              </p>
+              <p className="font-medium">${item.price}</p>
+              <div className="flex items-center gap-2">
+                {item.is_available ? (
+                  <span className="text-sm text-green-600 bg-green-100 px-2 py-0.5 rounded">
+                    Available
+                  </span>
+                ) : (
+                  <span className="text-sm text-red-600 bg-red-100 px-2 py-0.5 rounded">
+                    Unavailable
+                  </span>
+                )}
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" size="icon">
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon">
+              <BarChart className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   );
 };
