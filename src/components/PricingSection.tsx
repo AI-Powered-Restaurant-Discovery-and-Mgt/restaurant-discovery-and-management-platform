@@ -22,40 +22,74 @@ const pricingTiers: PricingTier[] = [
     monthlyPrice: 0,
     annualPrice: 0,
     description: "Perfect for trying out our platform",
-    features: ["Basic menu management", "Customer feedback", "Basic analytics"],
+    features: [
+      "Basic menu management",
+      "Limited customer feedback",
+      "Basic analytics",
+      "Community hub access",
+      "Basic food directory"
+    ],
     buttonText: "Get Started",
   },
   {
     name: "Starter",
-    monthlyPrice: 29,
-    annualPrice: 290,
+    monthlyPrice: 9.99,
+    annualPrice: 99,
     description: "Great for small restaurants",
-    features: ["Advanced menu management", "Priority support", "Detailed analytics", "Custom branding"],
+    features: [
+      "Advanced menu management",
+      "Priority customer feedback",
+      "Enhanced analytics",
+      "Full community access",
+      "Extended food directory",
+      "Basic AI recommendations"
+    ],
     buttonText: "Start Free Trial",
   },
   {
     name: "Pro",
-    monthlyPrice: 79,
-    annualPrice: 790,
+    monthlyPrice: 19.99,
+    annualPrice: 199,
     description: "Best for growing businesses",
-    features: ["Everything in Starter", "API access", "Advanced integrations", "Custom reports", "Team management"],
+    features: [
+      "Everything in Starter",
+      "Advanced AI recommendations",
+      "Health analytics",
+      "SEO tools",
+      "Priority support",
+      "API access"
+    ],
     isPopular: true,
     buttonText: "Start Free Trial",
   },
   {
     name: "Enterprise",
-    monthlyPrice: 199,
-    annualPrice: 1990,
+    monthlyPrice: 49.99,
+    annualPrice: 499,
     description: "For large restaurant chains",
-    features: ["Everything in Pro", "Dedicated support", "Custom development", "SLA guarantee", "Advanced security"],
+    features: [
+      "Everything in Pro",
+      "Unlimited AI features",
+      "Custom development",
+      "Dedicated support",
+      "White label options",
+      "Advanced integrations"
+    ],
     buttonText: "Contact Sales",
   },
   {
     name: "Lifetime",
-    monthlyPrice: 999,
-    annualPrice: 999,
+    monthlyPrice: 499,
+    annualPrice: 499,
     description: "One-time payment, lifetime access",
-    features: ["All Enterprise features", "Lifetime updates", "Priority feature requests", "Exclusive community"],
+    features: [
+      "All Enterprise features",
+      "Lifetime updates",
+      "VIP support",
+      "Early feature access",
+      "Exclusive community",
+      "Custom solutions"
+    ],
     isLimited: true,
     buttonText: "Get Lifetime Access",
   },
@@ -65,19 +99,22 @@ const comparisonFeatures = [
   "Menu Management",
   "Customer Feedback",
   "Analytics Dashboard",
+  "Community Hub Access",
+  "Food Directory",
+  "AI Recommendations",
+  "Health Analytics",
+  "SEO Tools",
   "API Access",
-  "Custom Branding",
   "Priority Support",
-  "Team Management",
   "Custom Development",
-  "SLA Guarantee",
+  "White Label Options"
 ];
 
 export const PricingSection = () => {
   const [isAnnual, setIsAnnual] = useState(false);
 
   return (
-    <section className="py-16 px-4 animate-fade-in">
+    <section id="pricing" className="py-16 px-4 animate-fade-in">
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
@@ -90,7 +127,7 @@ export const PricingSection = () => {
               className="data-[state=checked]:bg-primary"
             />
             <span className={`text-lg ${isAnnual ? "font-semibold" : ""}`}>
-              Annual <span className="text-primary">(Save 20%)</span>
+              Annual <span className="text-primary">(Save up to 20%)</span>
             </span>
           </div>
         </div>
@@ -115,7 +152,7 @@ export const PricingSection = () => {
               <CardContent className="flex-grow">
                 <div className="text-center mb-6">
                   <span className="text-4xl font-bold">
-                    ${isAnnual ? tier.annualPrice : tier.monthlyPrice}
+                    ${tier.name === "Lifetime" ? tier.monthlyPrice : (isAnnual ? tier.annualPrice : tier.monthlyPrice)}
                   </span>
                   {tier.name !== "Lifetime" && (
                     <span className="text-gray-600">/{isAnnual ? "year" : "month"}</span>
@@ -161,7 +198,10 @@ export const PricingSection = () => {
                       <TableCell key={`${tier.name}-${feature}`} className="text-center">
                         {tier.features.some((f) => 
                           f.toLowerCase().includes(feature.toLowerCase()) ||
-                          f.includes("Everything in")
+                          f.includes("Everything in") ||
+                          (tier.name === "Pro" && ["Menu Management", "Customer Feedback", "Analytics Dashboard", "Community Hub Access", "Food Directory"].includes(feature)) ||
+                          (tier.name === "Enterprise" && !["Lifetime updates", "Early feature access"].includes(feature)) ||
+                          (tier.name === "Lifetime")
                         ) ? (
                           <Check className="mx-auto text-primary w-5 h-5" />
                         ) : (
