@@ -1,5 +1,5 @@
 import { MinimalHeader } from "@/components/MinimalHeader";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +24,6 @@ import {
   Bell,
   Search
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -57,13 +56,19 @@ export const RestaurantDashboard = () => {
             <SidebarContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Dashboard">
+                  <SidebarMenuButton 
+                    tooltip="Dashboard"
+                    onClick={() => navigate("/dashboard/restaurant")}
+                  >
                     <LayoutDashboard />
                     <span>Overview</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Menu Management">
+                  <SidebarMenuButton 
+                    tooltip="Menu Management"
+                    onClick={() => navigate("/dashboard/menu-management")}
+                  >
                     <Menu />
                     <span>Menu Management</span>
                   </SidebarMenuButton>
