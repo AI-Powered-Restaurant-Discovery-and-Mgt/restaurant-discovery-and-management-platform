@@ -1,6 +1,7 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { FeatureSection } from "@/components/FeatureSection";
+import { PricingSection } from "@/components/PricingSection";
 import { Footer } from "@/components/Footer";
 
 const Index = () => {
@@ -81,6 +82,7 @@ const Index = () => {
         ctaLink="/auth?mode=sign-up&type=customer"
         alignment="right"
       />
+      <PricingSection />
       <Footer />
     </div>
   );
