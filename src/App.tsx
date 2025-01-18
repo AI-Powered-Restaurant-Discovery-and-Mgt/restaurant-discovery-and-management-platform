@@ -11,6 +11,12 @@ import { DiscoverRestaurants } from "@/components/customer/DiscoverRestaurants";
 import { FoodDirectory } from "@/components/customer/FoodDirectory";
 import { Marketplace } from "@/components/customer/Marketplace";
 import { GroceryHub } from "@/components/customer/GroceryHub";
+import { Communities } from "@/components/customer/Communities";
+import { Favorites } from "@/components/customer/Favorites";
+import { Messages } from "@/components/customer/Messages";
+import { Notifications } from "@/components/customer/Notifications";
+import { Settings } from "@/components/customer/Settings";
+import { Profile } from "@/components/customer/Profile";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +44,12 @@ function App() {
             <Route path="directory" element={<FoodDirectory />} />
             <Route path="marketplace" element={<Marketplace />} />
             <Route path="grocery" element={<GroceryHub />} />
+            <Route path="communities" element={<Communities />} />
+            <Route path="favorites" element={<Favorites />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
         </Routes>
       </Router>
