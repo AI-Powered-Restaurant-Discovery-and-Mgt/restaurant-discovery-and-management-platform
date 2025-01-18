@@ -1,4 +1,4 @@
-import { ShoppingCart, Bell } from "lucide-react";
+import { ShoppingCart, Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,12 +9,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 
 export const CustomerTopNav = () => {
   return (
     <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center px-4">
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="relative w-full max-w-sm mr-4">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search for restaurants, dishes..."
+              className="pl-8"
+            />
+          </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />
