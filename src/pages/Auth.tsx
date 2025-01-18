@@ -17,21 +17,32 @@ const AuthPage = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN") {
-        const { data: { user } } = await supabase.auth.getUser();
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('id', user?.id)
-          .single();
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error("No user found");
 
-        if (profile?.user_type === 'restaurant_owner') {
-          navigate("/dashboard/restaurant");
-        } else {
-          navigate("/dashboard/customer");
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_type')
+            .eq('id', user.id)
+            .single();
+
+          if (profileError) throw profileError;
+
+          // Redirect based on user type
+          if (profile?.user_type === 'restaurant_owner') {
+            navigate("/dashboard/restaurant");
+          } else {
+            navigate("/customer");
+          }
+        } catch (error) {
+          console.error("Error during authentication:", error);
+          setErrorMessage("An error occurred during authentication. Please try again.");
         }
       }
       if (event === "SIGNED_OUT") {
         setErrorMessage("");
+        navigate("/");
       }
     });
 
