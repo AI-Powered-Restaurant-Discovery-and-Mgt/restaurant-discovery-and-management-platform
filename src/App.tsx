@@ -6,12 +6,16 @@ import { RestaurantDashboard } from "@/components/layouts/RestaurantDashboard";
 import { CustomerDashboard } from "@/components/layouts/CustomerDashboard";
 import { MenuManagement } from "@/pages/MenuManagement";
 import { RestaurantHome } from "@/components/dashboard/RestaurantHome";
+import { CustomerHome } from "@/components/customer/CustomerHome";
+import { DiscoverRestaurants } from "@/components/customer/DiscoverRestaurants";
+import { FoodDirectory } from "@/components/customer/FoodDirectory";
+import { Marketplace } from "@/components/customer/Marketplace";
+import { GroceryHub } from "@/components/customer/GroceryHub";
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       retry: 1,
     },
   },
@@ -28,7 +32,13 @@ function App() {
             <Route path="restaurant" element={<RestaurantHome />} />
             <Route path="menu-management" element={<MenuManagement />} />
           </Route>
-          <Route path="/customer/*" element={<CustomerDashboard />} />
+          <Route path="/customer/*" element={<CustomerDashboard />}>
+            <Route index element={<CustomerHome />} />
+            <Route path="discover" element={<DiscoverRestaurants />} />
+            <Route path="directory" element={<FoodDirectory />} />
+            <Route path="marketplace" element={<Marketplace />} />
+            <Route path="grocery" element={<GroceryHub />} />
+          </Route>
         </Routes>
       </Router>
     </QueryClientProvider>
