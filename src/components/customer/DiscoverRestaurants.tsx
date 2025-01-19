@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { CustomerTopNav } from "./CustomerTopNav";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Restaurant {
   id: string;
@@ -19,9 +20,15 @@ interface Restaurant {
   description: string | null;
   cuisine_type: string | null;
   address: string | null;
+  rating?: number;
+  price_range?: string;
+  distance?: string;
+  reviews?: number;
+  tags?: string[];
+  image?: string;
 }
 
-const mockRestaurants = [
+const mockRestaurants: Restaurant[] = [
   {
     id: "1",
     name: "Sakura Sushi House",
@@ -78,6 +85,41 @@ const mockRestaurants = [
 
 const cuisineFilters = [
   "All", "Japanese", "Italian", "Indian", "Mexican", "Chinese", "Thai", "American"
+];
+
+const nearbyRestaurants = [
+  {
+    id: "5",
+    name: "Local Bistro",
+    description: "Your neighborhood favorite",
+    cuisine_type: "French",
+    address: "234 Local St",
+    rating: 4.4,
+    price_range: "$$",
+    distance: "0.3 miles",
+    reviews: 178,
+    tags: ["Cozy", "Local Favorite"],
+    image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
+  },
+  // ... add more nearby restaurants
+];
+
+const topCuisines = [
+  { name: "Italian", image: "https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=800&q=80" },
+  { name: "Japanese", image: "https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?w=800&q=80" },
+  { name: "Indian", image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&q=80" },
+  { name: "Mexican", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80" },
+];
+
+const promotions = [
+  {
+    id: "p1",
+    title: "50% Off Weekday Lunch",
+    restaurant: "Bella Italia",
+    validUntil: "March 31",
+    image: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&q=80",
+  },
+  // ... add more promotions
 ];
 
 export const DiscoverRestaurants = () => {
@@ -188,6 +230,7 @@ export const DiscoverRestaurants = () => {
           </p>
         </div>
 
+        {/* Cuisine Filters */}
         <div className="mb-8">
           <div className="flex gap-2 overflow-x-auto pb-4">
             {cuisineFilters.map((cuisine) => (
@@ -223,10 +266,78 @@ export const DiscoverRestaurants = () => {
           </Card>
         </div>
 
+        {/* Nearby Restaurants */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Nearby Restaurants</h2>
+          <Carousel className="w-full">
+            <CarouselContent>
+              {nearbyRestaurants.map((restaurant) => (
+                <CarouselItem key={restaurant.id} className="md:basis-1/2 lg:basis-1/3">
+                  {renderRestaurantCard(restaurant)}
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+
+        {/* Top Cuisines */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Top Cuisines</h2>
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="mb-4">
+              {topCuisines.map((cuisine) => (
+                <TabsTrigger key={cuisine.name} value={cuisine.name.toLowerCase()}>
+                  {cuisine.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {topCuisines.map((cuisine) => (
+                <Card key={cuisine.name} className="overflow-hidden">
+                  <div className="relative h-40">
+                    <img
+                      src={cuisine.image}
+                      alt={cuisine.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <h3 className="text-white text-xl font-bold">{cuisine.name}</h3>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </Tabs>
+        </div>
+
+        {/* Promotions & Deals */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Promotions & Deals</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {promotions.map((promo) => (
+              <Card key={promo.id} className="overflow-hidden">
+                <div className="relative h-48">
+                  <img
+                    src={promo.image}
+                    alt={promo.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent p-4 flex flex-col justify-end">
+                    <h3 className="text-white text-xl font-bold mb-1">{promo.title}</h3>
+                    <p className="text-white/90">{promo.restaurant}</p>
+                    <p className="text-white/80 text-sm">Valid until {promo.validUntil}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
         {renderCarouselSection("Trending Now", mockRestaurants)}
-        {renderCarouselSection("Recommended for You", mockRestaurants)}
-        {renderCarouselSection("New in Your Area", mockRestaurants)}
-        {renderCarouselSection("Popular This Week", mockRestaurants)}
+        {renderCarouselSection("Recently Viewed", mockRestaurants)}
+        {renderCarouselSection("Most Popular", mockRestaurants)}
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {mockRestaurants.map((restaurant) => (
