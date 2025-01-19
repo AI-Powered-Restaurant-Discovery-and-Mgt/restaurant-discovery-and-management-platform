@@ -77,7 +77,7 @@ export const CustomerHome = () => {
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {recommendations.map((section) => (
           <Card key={section.id}>
             <CardHeader>
