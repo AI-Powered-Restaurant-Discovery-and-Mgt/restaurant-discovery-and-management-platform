@@ -1,6 +1,12 @@
 import { ShoppingCart, Bell, Search, MessageSquare, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -12,10 +18,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const CustomerTopNav = () => {
   const navigate = useNavigate();
+  const [showMessages, setShowMessages] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -23,19 +31,8 @@ export const CustomerTopNav = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        <Link to="/customer" className="flex items-center gap-2 mr-8">
-          <svg
-            className="w-8 h-8 text-primary"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-          </svg>
-          <span className="text-xl font-bold text-secondary">foodtoks</span>
-        </Link>
-
         <div className="flex flex-1 items-center justify-between space-x-2">
           <div className="relative w-full max-w-lg">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -52,16 +49,14 @@ export const CustomerTopNav = () => {
               </Link>
             </Button>
             
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/customer/messages">
-                <MessageSquare className="h-5 w-5" />
-              </Link>
+            <Button variant="ghost" size="icon" onClick={() => setShowMessages(true)}>
+              <MessageSquare className="h-5 w-5" />
             </Button>
 
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-white">
-                5
+                3
               </span>
             </Button>
 
@@ -99,6 +94,17 @@ export const CustomerTopNav = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={showMessages} onOpenChange={setShowMessages}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Messages</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            <p className="text-sm text-muted-foreground">No messages yet</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
