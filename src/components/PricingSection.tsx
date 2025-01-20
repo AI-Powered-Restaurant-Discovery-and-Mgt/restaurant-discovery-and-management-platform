@@ -114,9 +114,15 @@ export const PricingSection = () => {
   const [isAnnual, setIsAnnual] = useState(false);
 
   const handlePayment = (tier: PricingTier) => {
-    const paymentLink = import.meta.env.VITE_PAYPAL_PAYMENT_LINK;
-    if (paymentLink) {
-      window.open(paymentLink, '_blank');
+    if (tier.name === "Lifetime") {
+      const paymentLink = import.meta.env.VITE_PAYPAL_PAYMENT_LINK;
+      if (paymentLink) {
+        window.open(paymentLink, '_blank');
+      }
+    } else {
+      // Placeholder for other tiers' payment handling
+      console.log(`Payment for ${tier.name} tier will be implemented soon`);
+      alert(`Payment link for ${tier.name} plan will be available soon!`);
     }
   };
 
@@ -180,7 +186,7 @@ export const PricingSection = () => {
                   onClick={() => handlePayment(tier)}
                 >
                   {tier.buttonText}
-                  <ExternalLink className="w-4 h-4" />
+                  {tier.name === "Lifetime" && <ExternalLink className="w-4 h-4" />}
                 </Button>
               </CardFooter>
             </Card>
