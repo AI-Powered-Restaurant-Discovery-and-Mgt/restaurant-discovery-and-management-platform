@@ -4,6 +4,8 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, X } from "lucide-react";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PricingTier {
   name: string;
@@ -112,6 +114,43 @@ const comparisonFeatures = [
 
 export const PricingSection = () => {
   const [isAnnual, setIsAnnual] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<PricingTier | null>(null);
+
+  const handlePayment = async (tier: PricingTier) => {
+    setSelectedTier(tier);
+  };
+
+  const createOrder = async (data: any, actions: any) => {
+    if (!selectedTier) return;
+    
+    const price = isAnnual ? selectedTier.annualPrice : selectedTier.monthlyPrice;
+    
+    return actions.order.create({
+      purchase_units: [
+        {
+          amount: {
+            value: price.toString(),
+            currency_code: "USD"
+          },
+          description: `${selectedTier.name} Plan - ${isAnnual ? 'Annual' : 'Monthly'}`
+        }
+      ]
+    });
+  };
+
+  const onApprove = async (data: any, actions: any) => {
+    const order = await actions.order.capture();
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && selectedTier) {
+      console.log("Payment successful", {
+        userId: user.id,
+        orderId: order.id,
+        plan: selectedTier.name,
+        isAnnual
+      });
+    }
+  };
 
   return (
     <section id="pricing" className="py-16 px-4 animate-fade-in">
@@ -168,9 +207,26 @@ export const PricingSection = () => {
                 </ul>
               </CardContent>
               <CardFooter className="mt-auto pt-6">
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  {tier.buttonText}
-                </Button>
+                {selectedTier?.name === tier.name ? (
+                  <PayPalScriptProvider options={{
+                    clientId: process.env.PAYPAL_CLIENT_ID || "",
+                    currency: "USD"
+                  }}>
+                    <PayPalButtons
+                      style={{ layout: "horizontal" }}
+                      createOrder={createOrder}
+                      onApprove={onApprove}
+                      className="w-full"
+                    />
+                  </PayPalScriptProvider>
+                ) : (
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90"
+                    onClick={() => handlePayment(tier)}
+                  >
+                    {tier.buttonText}
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
