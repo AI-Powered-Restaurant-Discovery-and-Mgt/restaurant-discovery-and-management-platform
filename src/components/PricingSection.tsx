@@ -125,31 +125,47 @@ export const PricingSection = () => {
     
     const price = isAnnual ? selectedTier.annualPrice : selectedTier.monthlyPrice;
     
-    return actions.order.create({
-      purchase_units: [
-        {
-          amount: {
-            value: price.toString(),
-            currency_code: "USD"
-          },
-          description: `${selectedTier.name} Plan - ${isAnnual ? 'Annual' : 'Monthly'}`
-        }
-      ]
-    });
+    try {
+      return actions.order.create({
+        purchase_units: [
+          {
+            amount: {
+              value: price.toString(),
+              currency_code: "USD"
+            },
+            description: `${selectedTier.name} Plan - ${isAnnual ? 'Annual' : 'Monthly'}`
+          }
+        ]
+      });
+    } catch (error) {
+      console.error("Error creating PayPal order:", error);
+      throw error;
+    }
   };
 
   const onApprove = async (data: any, actions: any) => {
-    const order = await actions.order.capture();
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user && selectedTier) {
-      console.log("Payment successful", {
-        userId: user.id,
-        orderId: order.id,
-        plan: selectedTier.name,
-        isAnnual
-      });
+    try {
+      const order = await actions.order.capture();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user && selectedTier) {
+        console.log("Payment successful", {
+          userId: user.id,
+          orderId: order.id,
+          plan: selectedTier.name,
+          isAnnual
+        });
+      }
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      throw error;
     }
+  };
+
+  const paypalOptions = {
+    clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || "",
+    currency: "USD",
+    intent: "capture",
   };
 
   return (
@@ -208,14 +224,19 @@ export const PricingSection = () => {
               </CardContent>
               <CardFooter className="mt-auto pt-6">
                 {selectedTier?.name === tier.name ? (
-                  <PayPalScriptProvider options={{
-                    clientId: process.env.PAYPAL_CLIENT_ID || "",
-                    currency: "USD"
-                  }}>
+                  <PayPalScriptProvider options={paypalOptions}>
                     <PayPalButtons
-                      style={{ layout: "horizontal" }}
+                      style={{ 
+                        layout: "horizontal",
+                        color: "gold",
+                        shape: "rect",
+                        label: "pay"
+                      }}
                       createOrder={createOrder}
                       onApprove={onApprove}
+                      onError={(err) => {
+                        console.error("PayPal error:", err);
+                      }}
                       className="w-full"
                     />
                   </PayPalScriptProvider>
