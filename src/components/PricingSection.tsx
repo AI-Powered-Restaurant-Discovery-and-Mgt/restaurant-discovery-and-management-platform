@@ -3,9 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, X } from "lucide-react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { supabase } from "@/integrations/supabase/client";
+import { Check, X, ExternalLink } from "lucide-react";
 
 interface PricingTier {
   name: string;
@@ -114,58 +112,12 @@ const comparisonFeatures = [
 
 export const PricingSection = () => {
   const [isAnnual, setIsAnnual] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<PricingTier | null>(null);
 
-  const handlePayment = async (tier: PricingTier) => {
-    setSelectedTier(tier);
-  };
-
-  const createOrder = async (data: any, actions: any) => {
-    if (!selectedTier) return;
-    
-    const price = isAnnual ? selectedTier.annualPrice : selectedTier.monthlyPrice;
-    
-    try {
-      return actions.order.create({
-        purchase_units: [
-          {
-            amount: {
-              value: price.toString(),
-              currency_code: "USD"
-            },
-            description: `${selectedTier.name} Plan - ${isAnnual ? 'Annual' : 'Monthly'}`
-          }
-        ]
-      });
-    } catch (error) {
-      console.error("Error creating PayPal order:", error);
-      throw error;
+  const handlePayment = (tier: PricingTier) => {
+    const paymentLink = import.meta.env.VITE_PAYPAL_PAYMENT_LINK;
+    if (paymentLink) {
+      window.open(paymentLink, '_blank');
     }
-  };
-
-  const onApprove = async (data: any, actions: any) => {
-    try {
-      const order = await actions.order.capture();
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user && selectedTier) {
-        console.log("Payment successful", {
-          userId: user.id,
-          orderId: order.id,
-          plan: selectedTier.name,
-          isAnnual
-        });
-      }
-    } catch (error) {
-      console.error("Error processing payment:", error);
-      throw error;
-    }
-  };
-
-  const paypalOptions = {
-    clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || "",
-    currency: "USD",
-    intent: "capture",
   };
 
   return (
@@ -223,31 +175,13 @@ export const PricingSection = () => {
                 </ul>
               </CardContent>
               <CardFooter className="mt-auto pt-6">
-                {selectedTier?.name === tier.name ? (
-                  <PayPalScriptProvider options={paypalOptions}>
-                    <PayPalButtons
-                      style={{ 
-                        layout: "horizontal",
-                        color: "gold",
-                        shape: "rect",
-                        label: "pay"
-                      }}
-                      createOrder={createOrder}
-                      onApprove={onApprove}
-                      onError={(err) => {
-                        console.error("PayPal error:", err);
-                      }}
-                      className="w-full"
-                    />
-                  </PayPalScriptProvider>
-                ) : (
-                  <Button 
-                    className="w-full bg-primary hover:bg-primary/90"
-                    onClick={() => handlePayment(tier)}
-                  >
-                    {tier.buttonText}
-                  </Button>
-                )}
+                <Button 
+                  className="w-full bg-primary hover:bg-primary/90 flex items-center justify-center gap-2"
+                  onClick={() => handlePayment(tier)}
+                >
+                  {tier.buttonText}
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
               </CardFooter>
             </Card>
           ))}
