@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, X, ExternalLink, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PricingTier {
@@ -123,37 +124,79 @@ export const PricingSection = () => {
     setIsLoading(true);
     
     try {
-      console.log(`Initiating payment process for ${tier.name} tier`);
-      const { data, error } = await supabase.functions.invoke('get-secret', {
-        body: { secretName: 'VITE_PAYPAL_PAYMENT_LINK' }
+      const { data: secretData, error: secretError } = await supabase.functions.invoke('get-secret', {
+        body: { secretName: 'PAYPAL_CLIENT_ID' }
       });
 
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
+      if (secretError) {
+        console.error('Error fetching PayPal client ID:', secretError);
+        throw secretError;
       }
 
-      if (!data?.paymentLink) {
-        console.error('Payment link not found in response');
-        throw new Error('Payment link not found');
+      if (!secretData?.paymentLink) {
+        console.error('PayPal client ID not found');
+        throw new Error('PayPal configuration not found');
       }
 
-      try {
-        const paymentUrl = new URL(data.paymentLink);
-        window.open(paymentUrl.toString(), '_blank', 'noopener,noreferrer');
-        toast({
-          title: "Payment Initiated",
-          description: "You will be redirected to PayPal to complete your payment.",
+      const paypalClientId = secretData.paymentLink;
+      
+      // Initialize PayPal with the client ID
+      const paypalInitialOptions = {
+        "client-id": paypalClientId,
+        currency: "USD",
+      };
+
+      // Create PayPal order
+      const createOrder = (data: any, actions: any) => {
+        const price = isAnnual ? tier.annualPrice : tier.monthlyPrice;
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: price.toString(),
+              currency_code: "USD"
+            },
+            description: `${tier.name} Plan - ${isAnnual ? 'Annual' : 'Monthly'}`
+          }]
         });
-      } catch (e) {
-        console.error('Invalid payment URL:', e);
-        throw new Error('Invalid payment link format');
-      }
+      };
+
+      // Handle successful payment
+      const onApprove = async (data: any, actions: any) => {
+        const order = await actions.order.capture();
+        console.log('Payment successful:', order);
+        toast({
+          title: "Payment Successful!",
+          description: `Thank you for subscribing to the ${tier.name} plan!`,
+        });
+      };
+
+      // Handle payment errors
+      const onError = (err: any) => {
+        console.error('Payment error:', err);
+        toast({
+          title: "Payment Error",
+          description: "There was a problem processing your payment. Please try again.",
+          variant: "destructive",
+        });
+      };
+
+      // Render PayPal buttons
+      return (
+        <PayPalScriptProvider options={paypalInitialOptions}>
+          <PayPalButtons
+            createOrder={createOrder}
+            onApprove={onApprove}
+            onError={onError}
+            style={{ layout: "horizontal" }}
+          />
+        </PayPalScriptProvider>
+      );
+
     } catch (error) {
-      console.error("Payment error:", error);
+      console.error("Payment setup error:", error);
       toast({
-        title: "Payment Error",
-        description: error instanceof Error ? error.message : "Failed to process payment. Please try again later.",
+        title: "Setup Error",
+        description: error instanceof Error ? error.message : "Failed to initialize payment. Please try again later.",
         variant: "destructive",
       });
     } finally {
