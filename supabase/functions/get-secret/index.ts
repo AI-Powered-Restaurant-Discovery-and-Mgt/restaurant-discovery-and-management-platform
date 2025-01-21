@@ -3,9 +3,11 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -14,8 +16,20 @@ serve(async (req) => {
     const { secretName } = await req.json()
     const secret = Deno.env.get(secretName)
 
+    if (!secret) {
+      return new Response(
+        JSON.stringify({ 
+          error: `Secret ${secretName} not found` 
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404,
+        },
+      )
+    }
+
     return new Response(
-      JSON.stringify({ [secretName]: secret }),
+      JSON.stringify({ data: { [secretName]: secret } }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

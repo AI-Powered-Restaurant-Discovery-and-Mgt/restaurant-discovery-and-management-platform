@@ -115,33 +115,38 @@ const comparisonFeatures = [
 export const PricingSection = () => {
   const [isAnnual, setIsAnnual] = useState(false);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async (tier: PricingTier) => {
     if (tier.name === "Lifetime") {
-      const { data: { VITE_PAYPAL_PAYMENT_LINK } } = await supabase
-        .functions.invoke('get-secret', {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('get-secret', {
           body: { secretName: 'VITE_PAYPAL_PAYMENT_LINK' }
         });
-      
-      if (!VITE_PAYPAL_PAYMENT_LINK) {
-        toast({
-          title: "Payment Link Not Configured",
-          description: "The payment link is not properly configured. Please try again later.",
-          variant: "destructive",
-        });
-        return;
-      }
 
-      try {
-        new URL(VITE_PAYPAL_PAYMENT_LINK);
-        window.open(VITE_PAYPAL_PAYMENT_LINK, '_blank', 'noopener,noreferrer');
-      } catch (e) {
-        console.error("Invalid payment link:", e);
+        if (error) throw error;
+        if (!data?.VITE_PAYPAL_PAYMENT_LINK) {
+          throw new Error('Payment link not found');
+        }
+
+        const paymentLink = data.VITE_PAYPAL_PAYMENT_LINK;
+
+        try {
+          new URL(paymentLink);
+          window.open(paymentLink, '_blank', 'noopener,noreferrer');
+        } catch (e) {
+          throw new Error('Invalid payment link format');
+        }
+      } catch (error) {
+        console.error("Payment error:", error);
         toast({
-          title: "Invalid Payment Link",
-          description: "The payment link is not properly formatted. Please contact support.",
+          title: "Payment Error",
+          description: error instanceof Error ? error.message : "Failed to process payment. Please try again later.",
           variant: "destructive",
         });
+      } finally {
+        setIsLoading(false);
       }
     } else {
       toast({
@@ -209,8 +214,9 @@ export const PricingSection = () => {
                 <Button 
                   className="w-full bg-primary hover:bg-primary/90 flex items-center justify-center gap-2"
                   onClick={() => handlePayment(tier)}
+                  disabled={isLoading}
                 >
-                  {tier.buttonText}
+                  {isLoading && tier.name === "Lifetime" ? "Loading..." : tier.buttonText}
                   {tier.name === "Lifetime" && <ExternalLink className="w-4 h-4" />}
                 </Button>
               </CardFooter>
