@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, X, ExternalLink } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PricingTier {
   name: string;
@@ -112,17 +113,39 @@ const comparisonFeatures = [
 
 export const PricingSection = () => {
   const [isAnnual, setIsAnnual] = useState(false);
+  const { toast } = useToast();
 
   const handlePayment = (tier: PricingTier) => {
     if (tier.name === "Lifetime") {
       const paymentLink = import.meta.env.VITE_PAYPAL_PAYMENT_LINK;
-      if (paymentLink) {
-        window.open(paymentLink, '_blank');
+      console.log("Payment link:", paymentLink); // Debug log
+      
+      if (!paymentLink) {
+        toast({
+          title: "Payment Link Not Configured",
+          description: "The payment link is not properly configured. Please try again later.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate if the link is a proper URL
+      try {
+        new URL(paymentLink);
+        window.open(paymentLink, '_blank', 'noopener,noreferrer');
+      } catch (e) {
+        console.error("Invalid payment link:", e);
+        toast({
+          title: "Invalid Payment Link",
+          description: "The payment link is not properly formatted. Please contact support.",
+          variant: "destructive",
+        });
       }
     } else {
-      // Placeholder for other tiers' payment handling
-      console.log(`Payment for ${tier.name} tier will be implemented soon`);
-      alert(`Payment link for ${tier.name} plan will be available soon!`);
+      toast({
+        title: "Coming Soon",
+        description: `Payment link for ${tier.name} plan will be available soon!`,
+      });
     }
   };
 
@@ -234,5 +257,4 @@ export const PricingSection = () => {
         </div>
       </div>
     </section>
-  );
 };
