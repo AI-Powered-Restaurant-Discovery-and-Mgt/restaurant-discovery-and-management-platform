@@ -140,9 +140,9 @@ export const PricingSection = () => {
 
       const paypalClientId = secretData.paymentLink;
       
-      // Initialize PayPal with the client ID
+      // Initialize PayPal with the client ID - Fixed property name
       const paypalInitialOptions = {
-        "client-id": paypalClientId,
+        clientId: paypalClientId, // Changed from "client-id" to clientId
         currency: "USD",
       };
 
