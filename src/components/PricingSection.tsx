@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, X, ExternalLink } from "lucide-react";
+import { Check, X, ExternalLink, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -116,43 +116,49 @@ export const PricingSection = () => {
   const [isAnnual, setIsAnnual] = useState(false);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [processingTier, setProcessingTier] = useState<string | null>(null);
 
   const handlePayment = async (tier: PricingTier) => {
-    if (tier.name === "Lifetime") {
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase.functions.invoke('get-secret', {
-          body: { secretName: 'VITE_PAYPAL_PAYMENT_LINK' }
-        });
-
-        if (error) throw error;
-        if (!data?.VITE_PAYPAL_PAYMENT_LINK) {
-          throw new Error('Payment link not found');
-        }
-
-        const paymentLink = data.VITE_PAYPAL_PAYMENT_LINK;
-
-        try {
-          new URL(paymentLink);
-          window.open(paymentLink, '_blank', 'noopener,noreferrer');
-        } catch (e) {
-          throw new Error('Invalid payment link format');
-        }
-      } catch (error) {
-        console.error("Payment error:", error);
-        toast({
-          title: "Payment Error",
-          description: error instanceof Error ? error.message : "Failed to process payment. Please try again later.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      toast({
-        title: "Coming Soon",
-        description: `Payment link for ${tier.name} plan will be available soon!`,
+    setProcessingTier(tier.name);
+    setIsLoading(true);
+    
+    try {
+      console.log(`Initiating payment process for ${tier.name} tier`);
+      const { data, error } = await supabase.functions.invoke('get-secret', {
+        body: { secretName: 'VITE_PAYPAL_PAYMENT_LINK' }
       });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      if (!data?.paymentLink) {
+        console.error('Payment link not found in response');
+        throw new Error('Payment link not found');
+      }
+
+      try {
+        const paymentUrl = new URL(data.paymentLink);
+        window.open(paymentUrl.toString(), '_blank', 'noopener,noreferrer');
+        toast({
+          title: "Payment Initiated",
+          description: "You will be redirected to PayPal to complete your payment.",
+        });
+      } catch (e) {
+        console.error('Invalid payment URL:', e);
+        throw new Error('Invalid payment link format');
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast({
+        title: "Payment Error",
+        description: error instanceof Error ? error.message : "Failed to process payment. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setProcessingTier(null);
     }
   };
 
@@ -214,10 +220,19 @@ export const PricingSection = () => {
                 <Button 
                   className="w-full bg-primary hover:bg-primary/90 flex items-center justify-center gap-2"
                   onClick={() => handlePayment(tier)}
-                  disabled={isLoading}
+                  disabled={isLoading && processingTier === tier.name}
                 >
-                  {isLoading && tier.name === "Lifetime" ? "Loading..." : tier.buttonText}
-                  {tier.name === "Lifetime" && <ExternalLink className="w-4 h-4" />}
+                  {isLoading && processingTier === tier.name ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      {tier.buttonText}
+                      {tier.name === "Lifetime" && <ExternalLink className="w-4 h-4" />}
+                    </>
+                  )}
                 </Button>
               </CardFooter>
             </Card>

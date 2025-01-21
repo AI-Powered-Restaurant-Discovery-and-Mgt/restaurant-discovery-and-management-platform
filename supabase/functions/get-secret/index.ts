@@ -17,6 +17,7 @@ serve(async (req) => {
     const secret = Deno.env.get(secretName)
 
     if (!secret) {
+      console.error(`Secret ${secretName} not found`)
       return new Response(
         JSON.stringify({ 
           error: `Secret ${secretName} not found` 
@@ -28,14 +29,16 @@ serve(async (req) => {
       )
     }
 
+    console.log(`Successfully retrieved secret: ${secretName}`)
     return new Response(
-      JSON.stringify({ data: { [secretName]: secret } }),
+      JSON.stringify({ paymentLink: secret }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       },
     )
   } catch (error) {
+    console.error('Error processing request:', error.message)
     return new Response(
       JSON.stringify({ error: error.message }),
       {
