@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, X, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PricingTier {
   name: string;
@@ -115,12 +116,14 @@ export const PricingSection = () => {
   const [isAnnual, setIsAnnual] = useState(false);
   const { toast } = useToast();
 
-  const handlePayment = (tier: PricingTier) => {
+  const handlePayment = async (tier: PricingTier) => {
     if (tier.name === "Lifetime") {
-      const paymentLink = import.meta.env.VITE_PAYPAL_PAYMENT_LINK;
-      console.log("Payment link:", paymentLink); // Debug log
+      const { data: { VITE_PAYPAL_PAYMENT_LINK } } = await supabase
+        .functions.invoke('get-secret', {
+          body: { secretName: 'VITE_PAYPAL_PAYMENT_LINK' }
+        });
       
-      if (!paymentLink) {
+      if (!VITE_PAYPAL_PAYMENT_LINK) {
         toast({
           title: "Payment Link Not Configured",
           description: "The payment link is not properly configured. Please try again later.",
@@ -129,10 +132,9 @@ export const PricingSection = () => {
         return;
       }
 
-      // Validate if the link is a proper URL
       try {
-        new URL(paymentLink);
-        window.open(paymentLink, '_blank', 'noopener,noreferrer');
+        new URL(VITE_PAYPAL_PAYMENT_LINK);
+        window.open(VITE_PAYPAL_PAYMENT_LINK, '_blank', 'noopener,noreferrer');
       } catch (e) {
         console.error("Invalid payment link:", e);
         toast({
