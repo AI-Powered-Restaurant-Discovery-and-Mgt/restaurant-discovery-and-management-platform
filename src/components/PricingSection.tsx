@@ -257,4 +257,5 @@ export const PricingSection = () => {
         </div>
       </div>
     </section>
+  );
 };
