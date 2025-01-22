@@ -28,7 +28,8 @@ import {
   Share2,
   Award,
   Hash,
-  Bell
+  Bell,
+  ChartBar
 } from "lucide-react";
 
 // Mock data
@@ -104,13 +105,32 @@ export const Communities = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [communities, setCommunities] = useState<any[]>([]);
   const [trendingPosts, setTrendingPosts] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [userAchievements, setUserAchievements] = useState(MOCK_ACHIEVEMENTS);
 
   useEffect(() => {
     fetchCommunities();
     fetchTrendingPosts();
+    fetchAnalytics();
   }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('community_analytics')
+        .select(`
+          *,
+          community_channels (name)
+        `)
+        .order('engagement_rate', { ascending: false });
+
+      if (error) throw error;
+      setAnalytics(data || []);
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    }
+  };
 
   const fetchCommunities = async () => {
     try {
@@ -187,6 +207,39 @@ export const Communities = () => {
             Create Community
           </Button>
         </div>
+      </div>
+
+      {/* Analytics Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {analytics.slice(0, 3).map((analytic) => (
+          <Card key={analytic.id}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                {analytic.community_channels?.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">Members</span>
+                  <span className="font-medium">{analytic.total_members}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">Active Members</span>
+                  <span className="font-medium">{analytic.active_members}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">Posts</span>
+                  <span className="font-medium">{analytic.posts_count}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">Engagement Rate</span>
+                  <span className="font-medium">{analytic.engagement_rate}%</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Search and Filters */}

@@ -51,6 +51,50 @@ export type Database = {
           },
         ]
       }
+      community_analytics: {
+        Row: {
+          active_members: number | null
+          comments_count: number | null
+          community_id: string | null
+          created_at: string | null
+          engagement_rate: number | null
+          id: string
+          posts_count: number | null
+          total_members: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          active_members?: number | null
+          comments_count?: number | null
+          community_id?: string | null
+          created_at?: string | null
+          engagement_rate?: number | null
+          id?: string
+          posts_count?: number | null
+          total_members?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          active_members?: number | null
+          comments_count?: number | null
+          community_id?: string | null
+          created_at?: string | null
+          engagement_rate?: number | null
+          id?: string
+          posts_count?: number | null
+          total_members?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_analytics_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "community_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_channels: {
         Row: {
           category: string
