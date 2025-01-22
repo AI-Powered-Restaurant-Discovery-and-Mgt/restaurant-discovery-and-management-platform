@@ -637,28 +637,58 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
           created_at: string
+          dietary_preferences: string[] | null
           email: string
+          favorite_cuisines: string[] | null
           full_name: string | null
           id: string
+          is_verified: boolean | null
+          location: string | null
+          preferences: Json | null
+          profile_completion_percentage: number | null
+          social_links: Json | null
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"] | null
+          website: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          dietary_preferences?: string[] | null
           email: string
+          favorite_cuisines?: string[] | null
           full_name?: string | null
           id: string
+          is_verified?: boolean | null
+          location?: string | null
+          preferences?: Json | null
+          profile_completion_percentage?: number | null
+          social_links?: Json | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"] | null
+          website?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          dietary_preferences?: string[] | null
           email?: string
+          favorite_cuisines?: string[] | null
           full_name?: string | null
           id?: string
+          is_verified?: boolean | null
+          location?: string | null
+          preferences?: Json | null
+          profile_completion_percentage?: number | null
+          social_links?: Json | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"] | null
+          website?: string | null
         }
         Relationships: []
       }

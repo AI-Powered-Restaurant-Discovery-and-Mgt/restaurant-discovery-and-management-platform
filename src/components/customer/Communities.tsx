@@ -11,28 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  Search, 
-  TrendingUp, 
-  Users, 
-  MessageSquare, 
-  Calendar,
-  ArrowUp,
-  ArrowDown,
-  BookmarkPlus,
-  Share2,
-  Award,
-  Hash,
-  Bell,
-  ChartBar
-} from "lucide-react";
+import { Search, Users, Calendar, Bell, Hash } from "lucide-react";
+import { UserProfileCard } from "./communities/UserProfileCard";
+import { AchievementCard } from "./communities/AchievementCard";
+import { CommunityPost } from "./communities/CommunityPost";
 
-// Mock data
 const MOCK_COMMUNITIES = [
   {
     id: '1',
@@ -84,21 +70,6 @@ const MOCK_EVENTS = [
   }
 ];
 
-const MOCK_ACHIEVEMENTS = [
-  {
-    id: '1',
-    name: 'Top Contributor',
-    description: 'Posted 100+ times',
-    icon: <Award className="h-4 w-4 text-yellow-500" />
-  },
-  {
-    id: '2',
-    name: 'Recipe Master',
-    description: 'Shared 50+ recipes',
-    icon: <Award className="h-4 w-4 text-purple-500" />
-  }
-];
-
 export const Communities = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -107,13 +78,55 @@ export const Communities = () => {
   const [trendingPosts, setTrendingPosts] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userAchievements, setUserAchievements] = useState(MOCK_ACHIEVEMENTS);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [achievements, setAchievements] = useState([
+    {
+      id: '1',
+      name: 'Top Contributor',
+      description: 'Posted 100+ times',
+      icon: 'award' as const,
+      color: 'text-yellow-500'
+    },
+    {
+      id: '2',
+      name: 'Recipe Master',
+      description: 'Shared 50+ recipes',
+      icon: 'trophy' as const,
+      color: 'text-purple-500'
+    },
+    {
+      id: '3',
+      name: 'Community Leader',
+      description: 'Started 5+ discussions',
+      icon: 'badge' as const,
+      color: 'text-blue-500'
+    }
+  ]);
 
   useEffect(() => {
+    fetchUserProfile();
     fetchCommunities();
     fetchTrendingPosts();
     fetchAnalytics();
   }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+        setUserProfile(data);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
 
   const fetchAnalytics = async () => {
     try {
@@ -209,6 +222,39 @@ export const Communities = () => {
         </div>
       </div>
 
+      {/* User Profile and Stats */}
+      {userProfile && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UserProfileCard user={userProfile} />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Your Stats</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold">23</div>
+                  <div className="text-sm text-muted-foreground">Posts</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">158</div>
+                  <div className="text-sm text-muted-foreground">Comments</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Achievements */}
+      <div className="flex gap-4 overflow-x-auto pb-2">
+        {achievements.map((achievement) => (
+          <div key={achievement.id} className="w-80 flex-shrink-0">
+            <AchievementCard achievement={achievement} />
+          </div>
+        ))}
+      </div>
+
       {/* Analytics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {analytics.slice(0, 3).map((analytic) => (
@@ -261,23 +307,6 @@ export const Communities = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main Content Area */}
         <div className="md:col-span-2 space-y-6">
-          {/* User Achievements */}
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {userAchievements.map((achievement) => (
-              <Card key={achievement.id} className="flex-shrink-0 w-64">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    {achievement.icon}
-                    <div>
-                      <h4 className="font-semibold">{achievement.name}</h4>
-                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
           <Tabs defaultValue="trending" className="w-full">
             <TabsList>
               <TabsTrigger value="trending">Trending</TabsTrigger>
@@ -287,46 +316,11 @@ export const Communities = () => {
 
             <TabsContent value="trending" className="space-y-4">
               {trendingPosts.map((post) => (
-                <Card key={post.id} className="hover:bg-muted/50 transition-colors">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <Avatar>
-                        <AvatarFallback>{post.profiles?.full_name?.[0] || 'U'}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{post.profiles?.full_name}</span>
-                          <span className="text-muted-foreground">in</span>
-                          <Badge variant="outline">{post.community_channels?.name}</Badge>
-                        </div>
-                        <h3 className="font-semibold">{post.title}</h3>
-                        <p className="text-muted-foreground">{post.content}</p>
-                        <div className="flex items-center gap-4 pt-2">
-                          <Button variant="ghost" size="sm" onClick={() => handleVote(post.id, 'up')}>
-                            <ArrowUp className="h-4 w-4 mr-1" />
-                            <span>123</span>
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleVote(post.id, 'down')}>
-                            <ArrowDown className="h-4 w-4 mr-1" />
-                            <span>12</span>
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <MessageSquare className="h-4 w-4 mr-1" />
-                            <span>45 Comments</span>
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <BookmarkPlus className="h-4 w-4 mr-1" />
-                            Save
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Share2 className="h-4 w-4 mr-1" />
-                            Share
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <CommunityPost
+                  key={post.id}
+                  post={post}
+                  onVote={handleVote}
+                />
               ))}
             </TabsContent>
 
@@ -390,7 +384,6 @@ export const Communities = () => {
             </CardContent>
           </Card>
 
-          {/* Upcoming Events */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
