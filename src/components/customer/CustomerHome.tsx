@@ -76,8 +76,38 @@ export const CustomerHome = () => {
   ];
 
   return (
-    <div className="space-y-8">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="flex gap-4">
+      {/* Left column - Posts */}
+      <div className="flex-1 max-w-2xl ml-4">
+        <Tabs defaultValue="for-you" className="space-y-4">
+          <TabsList className="w-full justify-start">
+            <TabsTrigger value="for-you">For You</TabsTrigger>
+            <TabsTrigger value="trending">Trending Now</TabsTrigger>
+            <TabsTrigger value="following">Following</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="for-you" className="space-y-4">
+            {feedItems.map((post) => (
+              <InstagramPost key={post.id} {...post} />
+            ))}
+          </TabsContent>
+
+          <TabsContent value="trending" className="space-y-4">
+            {trendingPosts.map((post) => (
+              <InstagramPost key={post.id} {...post} />
+            ))}
+          </TabsContent>
+
+          <TabsContent value="following" className="space-y-4">
+            {followingPosts.map((post) => (
+              <InstagramPost key={post.id} {...post} />
+            ))}
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Right column - Recommendations and other content */}
+      <div className="w-80 space-y-4 mr-4">
         {recommendations.map((section) => (
           <Card key={section.id}>
             <CardHeader>
@@ -99,32 +129,6 @@ export const CustomerHome = () => {
           </Card>
         ))}
       </div>
-
-      <Tabs defaultValue="for-you" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="for-you">For You</TabsTrigger>
-          <TabsTrigger value="trending">Trending Now</TabsTrigger>
-          <TabsTrigger value="following">Following</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="for-you" className="space-y-4">
-          {feedItems.map((post) => (
-            <InstagramPost key={post.id} {...post} />
-          ))}
-        </TabsContent>
-
-        <TabsContent value="trending" className="space-y-4">
-          {trendingPosts.map((post) => (
-            <InstagramPost key={post.id} {...post} />
-          ))}
-        </TabsContent>
-
-        <TabsContent value="following" className="space-y-4">
-          {followingPosts.map((post) => (
-            <InstagramPost key={post.id} {...post} />
-          ))}
-        </TabsContent>
-      </Tabs>
     </div>
   );
 };

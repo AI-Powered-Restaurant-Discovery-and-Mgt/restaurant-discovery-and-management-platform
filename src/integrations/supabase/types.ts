@@ -637,58 +637,85 @@ export type Database = {
       }
       profiles: {
         Row: {
+          achievements: Json | null
+          activity_streak: number | null
           avatar_url: string | null
           bio: string | null
           created_at: string
           dietary_preferences: string[] | null
           email: string
           favorite_cuisines: string[] | null
+          followers_count: number | null
+          following_count: number | null
           full_name: string | null
           id: string
           is_verified: boolean | null
+          last_active_at: string | null
           location: string | null
           preferences: Json | null
           profile_completion_percentage: number | null
+          saved_addresses: Json | null
           social_links: Json | null
+          total_posts: number | null
+          total_reviews: number | null
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"] | null
           website: string | null
+          weekly_challenges_completed: number | null
         }
         Insert: {
+          achievements?: Json | null
+          activity_streak?: number | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
           dietary_preferences?: string[] | null
           email: string
           favorite_cuisines?: string[] | null
+          followers_count?: number | null
+          following_count?: number | null
           full_name?: string | null
           id: string
           is_verified?: boolean | null
+          last_active_at?: string | null
           location?: string | null
           preferences?: Json | null
           profile_completion_percentage?: number | null
+          saved_addresses?: Json | null
           social_links?: Json | null
+          total_posts?: number | null
+          total_reviews?: number | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"] | null
           website?: string | null
+          weekly_challenges_completed?: number | null
         }
         Update: {
+          achievements?: Json | null
+          activity_streak?: number | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
           dietary_preferences?: string[] | null
           email?: string
           favorite_cuisines?: string[] | null
+          followers_count?: number | null
+          following_count?: number | null
           full_name?: string | null
           id?: string
           is_verified?: boolean | null
+          last_active_at?: string | null
           location?: string | null
           preferences?: Json | null
           profile_completion_percentage?: number | null
+          saved_addresses?: Json | null
           social_links?: Json | null
+          total_posts?: number | null
+          total_reviews?: number | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"] | null
           website?: string | null
+          weekly_challenges_completed?: number | null
         }
         Relationships: []
       }
@@ -843,6 +870,38 @@ export type Database = {
           },
         ]
       }
+      saved_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_id: string
+          item_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_id: string
+          item_type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          item_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_reviews: {
         Row: {
           comment: string | null
@@ -921,6 +980,42 @@ export type Database = {
           {
             foreignKeyName: "shopping_cart_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_follows: {
+        Row: {
+          created_at: string | null
+          follower_id: string | null
+          following_id: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          follower_id?: string | null
+          following_id?: string | null
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          follower_id?: string | null
+          following_id?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_follows_following_id_fkey"
+            columns: ["following_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
