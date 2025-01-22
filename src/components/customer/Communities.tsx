@@ -12,9 +12,18 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Users, Calendar, Bell, Hash } from "lucide-react";
+import { 
+  Search, 
+  Users, 
+  Calendar, 
+  Bell, 
+  Hash, 
+  TrendingUp,
+  User 
+} from "lucide-react";
 import { UserProfileCard } from "./communities/UserProfileCard";
 import { AchievementCard } from "./communities/AchievementCard";
 import { CommunityPost } from "./communities/CommunityPost";
@@ -359,7 +368,7 @@ export const Communities = () => {
                     <div key={community.id} className="flex items-start gap-4">
                       <Avatar>
                         <AvatarImage src={community.image} />
-                        <AvatarFallback>{community.name[0]}</AvatarFallback>
+                        <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <h4 className="font-semibold">{community.name}</h4>
