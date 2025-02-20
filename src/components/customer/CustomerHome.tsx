@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InstagramPost } from "./InstagramPost";
+import { CreatePostDialog } from "./CreatePostDialog";
 import { usePosts } from "@/hooks/usePosts";
 import { Loader2 } from "lucide-react";
 
@@ -72,6 +73,7 @@ export const CustomerHome = () => {
     <div className="flex gap-4">
       {/* Left column - Posts */}
       <div className="flex-1 max-w-2xl ml-4">
+        <CreatePostDialog />
         <Tabs defaultValue="for-you" className="space-y-4">
           <TabsList className="w-full justify-start">
             <TabsTrigger value="for-you">For You</TabsTrigger>
