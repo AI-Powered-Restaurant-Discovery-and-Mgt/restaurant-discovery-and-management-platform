@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ interface InstagramPostProps {
   likes: number;
   comments: number;
   timeAgo: string;
+  onLike?: () => void;
 }
 
 export const InstagramPost = ({
@@ -23,9 +25,15 @@ export const InstagramPost = ({
   likes,
   comments,
   timeAgo,
+  onLike,
 }: InstagramPostProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+    onLike?.();
+  };
 
   return (
     <Card className="max-w-xl w-full mx-auto mb-6">
@@ -49,7 +57,7 @@ export const InstagramPost = ({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsLiked(!isLiked)}
+              onClick={handleLike}
             >
               <Heart
                 className={`h-6 w-6 ${isLiked ? "fill-red-500 text-red-500" : ""}`}

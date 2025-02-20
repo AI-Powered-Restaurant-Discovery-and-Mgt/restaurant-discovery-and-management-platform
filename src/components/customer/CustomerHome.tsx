@@ -1,40 +1,14 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InstagramPost } from "./InstagramPost";
+import { usePosts } from "@/hooks/usePosts";
+import { Loader2 } from "lucide-react";
 
 export const CustomerHome = () => {
-  const feedItems = [
-    {
-      id: "1",
-      username: "italianfoodlover",
-      userAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-      image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
-      caption: "Experience authentic Italian cuisine in your neighborhood. Join us for our grand opening!",
-      likes: 245,
-      comments: 18,
-      timeAgo: "2 hours ago",
-    },
-    {
-      id: "2",
-      username: "homechef",
-      userAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-      image: "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-      caption: "Learn how to make the perfect pizza at home with our step-by-step guide!",
-      likes: 532,
-      comments: 42,
-      timeAgo: "5 hours ago",
-    },
-    {
-      id: "3",
-      username: "foodworkshop",
-      userAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
-      image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d",
-      caption: "Join our weekend cooking workshop with Chef John. Limited spots available!",
-      likes: 876,
-      comments: 91,
-      timeAgo: "1 day ago",
-    },
-  ];
+  const forYouPosts = usePosts('for-you');
+  const trendingPosts = usePosts('trending');
+  const followingPosts = usePosts('following');
 
   const recommendations = [
     {
@@ -49,31 +23,50 @@ export const CustomerHome = () => {
     },
   ];
 
-  const trendingPosts = [
-    {
-      id: "4",
-      username: "foodtrends",
-      userAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
-      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
-      caption: "The hottest food trend of 2024: Fusion Tacos! 🌮✨",
-      likes: 1532,
-      comments: 203,
-      timeAgo: "3 hours ago",
-    },
-  ];
+  const renderPosts = (
+    posts: typeof forYouPosts.posts,
+    isLoading: boolean,
+    error: unknown
+  ) => {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center p-8">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      );
+    }
 
-  const followingPosts = [
-    {
-      id: "5",
-      username: "healthyeats",
-      userAvatar: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39",
-      image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe",
-      caption: "Start your day right with this nutritious breakfast bowl! 🥗",
-      likes: 428,
-      comments: 32,
-      timeAgo: "1 hour ago",
-    },
-  ];
+    if (error) {
+      return (
+        <div className="text-center p-8 text-muted-foreground">
+          Error loading posts. Please try again later.
+        </div>
+      );
+    }
+
+    if (!posts?.length) {
+      return (
+        <div className="text-center p-8 text-muted-foreground">
+          No posts found. Follow some users to see their posts here!
+        </div>
+      );
+    }
+
+    return posts.map((post) => (
+      <InstagramPost
+        key={post.id}
+        id={post.id}
+        username={post.profiles?.full_name || 'Anonymous'}
+        userAvatar={post.profiles?.avatar_url || ''}
+        image={post.image_url || ''}
+        caption={post.content}
+        likes={post.likes_count || 0}
+        comments={post.comments_count || 0}
+        timeAgo={new Date(post.created_at).toLocaleDateString()}
+        onLike={() => forYouPosts.toggleLike(post.id)}
+      />
+    ));
+  };
 
   return (
     <div className="flex gap-4">
@@ -87,21 +80,15 @@ export const CustomerHome = () => {
           </TabsList>
           
           <TabsContent value="for-you" className="space-y-4">
-            {feedItems.map((post) => (
-              <InstagramPost key={post.id} {...post} />
-            ))}
+            {renderPosts(forYouPosts.posts, forYouPosts.isLoading, forYouPosts.error)}
           </TabsContent>
 
           <TabsContent value="trending" className="space-y-4">
-            {trendingPosts.map((post) => (
-              <InstagramPost key={post.id} {...post} />
-            ))}
+            {renderPosts(trendingPosts.posts, trendingPosts.isLoading, trendingPosts.error)}
           </TabsContent>
 
           <TabsContent value="following" className="space-y-4">
-            {followingPosts.map((post) => (
-              <InstagramPost key={post.id} {...post} />
-            ))}
+            {renderPosts(followingPosts.posts, followingPosts.isLoading, followingPosts.error)}
           </TabsContent>
         </Tabs>
       </div>
